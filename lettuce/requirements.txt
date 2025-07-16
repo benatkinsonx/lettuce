@@ -45,7 +45,8 @@ jsonref==1.1.0
 jsonschema==4.23.0
 jsonschema-specifications==2024.10.1
 lazy-imports==0.4.0
--e file:///Users/benjaminpartridge/Projects/lettuce/lettuce
+# -e file:///Users/benjaminpartridge/Projects/lettuce/lettuce
+-e .
 llama-cpp-haystack==1.0.0
 llama-cpp-python==0.3.7
 loguru==0.7.3
