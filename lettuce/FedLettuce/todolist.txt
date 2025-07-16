@@ -1,0 +1,124 @@
+WEEK 1 TO-DO LIST - FEDERATED LETTUCE IMPLEMENTATION
+========================================================
+
+Based on your meeting transcript and the current state of your project, here's your To-Do List for This Week:
+
+WEEK 1 PRIORITY TASKS (THIS WEEK)
+==================================
+
+MONDAY-TUESDAY: Repository Setup
+---------------------------------
+1. Fork the Lettuce repository
+   - Go to the original Lettuce GitHub repo
+   - Fork it to your own GitHub account
+   - Clone your forked version locally
+
+2. Add Flower as a dependency
+   - In your forked repo, add Flower to the pyproject.toml file
+   - James suggested: flower-whatever-version in dependencies
+   - Run uv sync to install dependencies
+
+3. Create federated structure
+   - Create a new folder: fed_lettuce/ in your Lettuce repo
+   - This is where all your federated implementation will go
+   - Set up the basic directory structure
+
+WEDNESDAY-THURSDAY: Basic Integration
+-------------------------------------
+4. Create the Flower client wrapper
+   - In fed_lettuce/, create a lettuce_client.py file
+   - Implement a basic LettuceClient class inheriting from fl.client.NumPyClient
+   - Import and use the LLMPipeline you already have working
+   - Follow the pattern from your logistic regression example
+
+5. Set up multiple client environments
+   - Create separate folders for each client's data: client_1/, client_2/, etc.
+   - Each client folder should have its own dataset
+   - Set up multiple terminal/environment approach (as you did with logistic regression)
+
+FRIDAY: Testing and Basic Validation
+-------------------------------------
+6. Test basic federated setup
+   - Run a simple 2-client federated test
+   - Make sure clients can communicate with server
+   - Don't worry about aggregation logic yet - just test connectivity
+
+7. Verify Lettuce pipeline works in federated context
+   - Test that your LLMPipeline runs correctly within the Flower client
+   - Ensure CPU-only operation works (ignore GPU for now)
+
+TECHNICAL IMPLEMENTATION DETAILS
+=================================
+
+Folder Structure to Create:
+---------------------------
+your-lettuce-fork/
+├── fed_lettuce/
+│   ├── lettuce_client.py
+│   ├── server.py
+│   ├── data/
+│   │   ├── client_1/
+│   │   ├── client_2/
+│   │   └── client_3/
+│   └── run_federated.py
+
+Key Code to Write:
+------------------
+Based on your meeting, you need to create something like:
+
+# In fed_lettuce/lettuce_client.py
+import flwr as fl
+from lettuce.components.pipeline import LLMPipeline
+
+class LettuceClient(fl.client.NumPyClient):
+    def __init__(self, client_id):
+        self.client_id = client_id
+        self.pipeline = LLMPipeline(...)  # Your existing pipeline
+        
+    def fit(self, parameters, config):
+        # Load local data
+        # Run Lettuce pipeline
+        # Calculate hit rates
+        # Return aggregated statistics
+        pass
+
+WHAT NOT TO FOCUS ON THIS WEEK
+===============================
+- GPU optimization - Your supervisor was clear: CPU first
+- Complex aggregation methods - Start with simple statistics
+- Performance tuning - Focus on getting it working
+- Advanced privacy features - Basic functionality first
+
+KEY RESOURCES TO REVIEW
+========================
+- Flower documentation: https://flower.ai/
+- Your previous logistic regression implementation - Use as template
+- Lettuce inspector GitHub - For test datasets (James mentioned this)
+
+SUCCESS CRITERIA FOR END OF WEEK
+=================================
+☐ Forked repo with Flower dependency added
+☐ Basic federated structure created
+☐ Simple 2-client test runs without errors
+☐ Lettuce pipeline executes within Flower client
+☐ Clear plan for next week's aggregation logic
+
+WHEN TO ASK FOR HELP
+=====================
+- If you get stuck on any step, use the Teams chat immediately
+- Don't wait until the next meeting
+- Your supervisor emphasized: "send us messages and we will help"
+
+NEXT WEEK PREVIEW
+=================
+Once you have basic federated setup working, Week 2 will focus on:
+- Ground truth evaluation logic
+- Hit rate calculations (top-k accuracy)
+- Statistics aggregation on server
+- Multiple client testing with different datasets
+
+REMEMBER
+========
+Your supervisor said "if you get lettuce working on a federated environment, then if you need to change it to use GPU, it will still be working in a federated environment, which is the priority now."
+
+Focus on getting the federated deployment working first - everything else can be optimized later!
