@@ -75,7 +75,7 @@ def main():
     
     # Testing with multiple terms
     print("\n=== Multiple terms test ===")
-    call_lettuce_simple(["ibuprofen", "tylenol"])
+    call_lettuce_simple(["Memantine HCL", "Ppaliperidone (3-month)"])
 
 if __name__ == "__main__":
     main()
