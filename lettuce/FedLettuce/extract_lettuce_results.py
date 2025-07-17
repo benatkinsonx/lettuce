@@ -5,6 +5,7 @@ Simple way to call LETTUCE CLI from Python - just like you would in terminal
 
 import subprocess
 import os
+import ast
 
 def call_lettuce_simple(informal_names):
     """
@@ -39,18 +40,25 @@ def call_lettuce_simple(informal_names):
         endmarker = '-------------- End ---------------'
         endmarker_pos = clean_raw_output.find(endmarker)
 
-        clear_results = clean_raw_output[endmarker_pos + len(endmarker):]
+        clean_results_str = clean_raw_output[endmarker_pos + len(endmarker):]
+        clean_results_dict = ast.literal_eval(clean_results_str)
+
+        results_dict = {}
+        for query_dict in clean_results_dict:
+            topk_results = [d['content'] for d in query_dict['Vector Search Results']]
+            informal_term = query_dict['query']
+            results_dict[informal_term] = topk_results
 
         if result.returncode == 0:
             print('Success!')
             print('Output:')
-            print(clear_results)
+            print(results_dict)
         else:
             print('Failed :(')
             print('Error:')
             print(result.stderr)
             
-        return clear_results # and in both of those above cases, always return the results
+        return topk_results # and in both of those above cases, always return the results
         
     except Exception as e: # for an unexpected error, print the error and return None
         print(f"Error: {e}")
@@ -61,13 +69,13 @@ def main():
     print("Simple LETTUCE CLI Call")
     print("=" * 30)
     
-    # Test with single term (exactly like your terminal command)
-    print("=== Single term test ===")
-    call_lettuce_simple("ibuprofen")
+    # # Test with single term (exactly like your terminal command)
+    # print("=== Single term test ===")
+    # call_lettuce_simple("ibuprofen")
     
-    # # Testing with multiple terms
-    # print("\n=== Multiple terms test ===")
-    # call_lettuce_simple(["ibuprofen", "tylenol"])
+    # Testing with multiple terms
+    print("\n=== Multiple terms test ===")
+    call_lettuce_simple(["ibuprofen", "tylenol"])
 
 if __name__ == "__main__":
     main()
