@@ -12,6 +12,7 @@ import hashlib
 import os
 
 from config import NUM_CLIENTS
+from groundtruth_checking import ground_truth_checker
 
 # ============================================================================
 # DATA LOADING & PARTITIONING
