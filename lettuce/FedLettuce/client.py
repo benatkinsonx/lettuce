@@ -44,11 +44,20 @@ class FlowerClient(NumPyClient):
     def fit(self, parameters, config):
         df = load_clientdata(self.client_id)
         wrong_terms = ground_truth_checker(df)
+        print(f"Client {self.client_id} wrong terms: {wrong_terms}")
 
-        # Convert to NumPy array (e.g., byte-encoded string list)
-        encoded_terms = np.array([term.encode('utf-8') for term in wrong_terms], dtype=object)
+        if len(wrong_terms) == 0:
+            param_array = np.array([], dtype=np.uint8)
+        else:
+            joined_terms = "\n".join(wrong_terms)
+            byte_data = joined_terms.encode('utf-8')
+            param_array = np.frombuffer(byte_data, dtype=np.uint8)
 
-        return [encoded_terms], len(encoded_terms), {}
+        print(f"Client {self.client_id} sending parameter array of shape {param_array.shape} and dtype {param_array.dtype}")
+
+        return [param_array], len(wrong_terms), {}
+
+
 
 # ============================================================================
 # CLIENT APP CONFIGURATION

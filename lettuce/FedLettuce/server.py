@@ -18,14 +18,24 @@ from config import NUM_CLIENTS, MIN_NUM_CLIENTS, NUM_ROUNDS
 # AGGREGATION FUNCTIONS
 # ============================================================================
 
-def aggregate_failed_terms(results: List[Tuple[ClientProxy, FitRes]]) -> List[str]:
-    """Aggregate failed terms from all clients"""
-    all_failed_terms = []
+def aggregate_failed_terms(results):
+    counts = {}
+
     for _, fit_res in results:
-        client_failed_terms = parameters_to_ndarrays(fit_res.parameters)[0]
-        client_failed_terms = [term.decode("utf-8") for term in client_failed_terms]
-        all_failed_terms.extend(client_failed_terms)
-    return all_failed_terms
+        # Get the numpy uint8 array from client parameters
+        param_array = fit_res.parameters[0]
+
+        # Convert back to bytes
+        byte_data = param_array.tobytes()
+
+        # Decode the string and split by newline to get original terms
+        terms = byte_data.decode('utf-8').split('\n')
+
+        for term in terms:
+            counts[term] = counts.get(term, 0) + 1
+
+    return counts
+
 
 def convert_scalar_to_FlowerParameters(aggregated_value: float) -> Parameters:
     """Convert aggregated values (NumPy array) back to Flower parameters"""
