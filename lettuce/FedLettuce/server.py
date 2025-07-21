@@ -18,18 +18,14 @@ from config import NUM_CLIENTS, MIN_NUM_CLIENTS, NUM_ROUNDS
 # AGGREGATION FUNCTIONS
 # ============================================================================
 
-def aggregate_weightedavg_summarystat(results: List[Tuple[ClientProxy, FitRes]]) -> float:
-    """Aggregate values from multiple clients using weighted average"""
-    values = []
-    weights = []
-    
+def aggregate_failed_terms(results: List[Tuple[ClientProxy, FitRes]]) -> List[str]:
+    """Aggregate failed terms from all clients"""
+    all_failed_terms = []
     for _, fit_res in results:
-        value = (parameters_to_ndarrays(fit_res.parameters))[0][0] # extract summary stat
-        weight = fit_res.num_examples # extract num_examples - to be used as the weight
-        # append those values to the global empty arrays
-        values.append(value)
-        weights.append(weight)
-    return np.average(values, weights=weights) # compute the weighted average
+        client_failed_terms = parameters_to_ndarrays(fit_res.parameters)[0]
+        client_failed_terms = [term.decode("utf-8") for term in client_failed_terms]
+        all_failed_terms.extend(client_failed_terms)
+    return all_failed_terms
 
 def convert_scalar_to_FlowerParameters(aggregated_value: float) -> Parameters:
     """Convert aggregated values (NumPy array) back to Flower parameters"""
@@ -58,28 +54,23 @@ class FedAnalytics(Strategy):
         clients = client_manager.sample(num_clients=NUM_CLIENTS, min_num_clients=MIN_NUM_CLIENTS)
         return [(client, fit_ins) for client in clients]
 
-    def aggregate_fit(self, server_round: int, results: List[Tuple[ClientProxy, FitRes]], 
-                      failures: List[Union[Tuple[ClientProxy, FitRes], BaseException]]
-                      ) -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
-        """Aggregate results from all clients"""
-
+    def aggregate_fit(self, server_round, results, failures):
         if not results:
-            print("WARNING: No results received from clients")
+            print("No results received")
             return None, {}
-        
-        # Aggregate the mean values
-        agg_scalar = aggregate_weightedavg_summarystat(results)
-        
-        # Convert back to parameters
-        agg_FlowerParameter = convert_scalar_to_FlowerParameters(agg_scalar)
-        
-        print(f"Aggregated mean age across all clients: {agg_scalar:.2f}")
-        return agg_FlowerParameter, {}
+
+        # Gather all failed terms
+        failed_terms = aggregate_failed_terms(results)
+        print(f"❌ Aggregated failed terms from round {server_round}: {failed_terms}")
+
+        # Convert to Flower Parameters to pass into the next round if needed (even if unused)
+        failed_terms_bytes = [term.encode("utf-8") for term in failed_terms]
+        return ndarrays_to_parameters([np.array(failed_terms_bytes, dtype=object)]), {"num_failed_terms": len(failed_terms)}
+
 
     def evaluate(self, server_round: int, parameters: Parameters) -> Optional[Tuple[float, Dict[str, Scalar]]]:
         """Evaluate the aggregated parameters"""
-        if parameters is None:
-            return 0, {"Aggregated mean age": []}
+        return None
         
         agg_scalar = [arr.item() for arr in parameters_to_ndarrays(parameters)]
         return 0, {"Aggregated mean age": agg_scalar}

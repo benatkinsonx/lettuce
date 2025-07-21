@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# groundtruth_checker.py
 """
 Call LETTUCE CLI from Python and check ground truth
 """

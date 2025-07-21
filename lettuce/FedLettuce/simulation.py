@@ -17,6 +17,7 @@ if __name__ == "__main__":
     # Create client configurations to ensure proper partition assignment
     client_configs = []
     for i in range(NUM_CLIENTS):
+        print(f'SIMULATING CLIENT {i}')
         client_configs.append({"client_id": i})
     
     # Run simulation with explicit client configurations
