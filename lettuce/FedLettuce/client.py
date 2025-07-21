@@ -17,11 +17,11 @@ from config import NUM_CLIENTS
 # DATA LOADING & PARTITIONING
 # ============================================================================
 
-def load_clientdata(client_id: int, data_dir: str = "./data/clientdata"):
+def load_clientdata(client_id: int, data_dir: str = "./FedLettuce/data/clientdata"):
     clientdata_file = f'client{client_id}_data.csv'
-    clientdata_path = os.join(data_dir, clientdata_file)
+    clientdata_path = os.path.join(data_dir, clientdata_file)
     client_df = pd.read_csv(clientdata_path)
-    print(f'Client ID: {client_id}, loaded {len(client_df)} instances from {clientdata_path}')
+    print(f'Client {client_id} loaded {len(client_df)} terms from {clientdata_path}')
     return client_df
 
 # ============================================================================
@@ -40,34 +40,15 @@ class FlowerClient(NumPyClient):
     def __init__(self, client_id: int):
         self.client_id = client_id
 
-    # no diff priv
-    # def fit(self, parameters, config):
-    #     partition_df = load_datasets(df, num_partitions=NUM_CLIENTS, client_id=self.client_id)
-    #     print(f"Client {self.client_id} dataset size: {len(partition_df)}")
-    #     print(f"First 5 patient IDs: {partition_df.index[:5].tolist()}")
-    #     print(f"Mean age: {partition_df['age'].mean()}")
-        
-    #     partition_mean = compute_mean(partition_df, 'age')
-
-    #     summarystat = [np.array([partition_mean])]
-    #     num_examples = len(partition_df)
-    #     metrics = {}
-    #     return (summarystat, num_examples, metrics)
-
-    # yes diff priv
     def fit(self, parameters, config):
-        partition_df = load_datasets(df, num_partitions=NUM_CLIENTS, client_id=self.client_id)
-        partition_mean = compute_mean(partition_df, 'age')
-        
-        # Add local differential privacy
-        epsilon = config.get('epsilon', 10.0)
-        sensitivity = 60.0 / len(partition_df)  # age range / partition size
-        noise = np.random.laplace(0, sensitivity / epsilon)
-        noisy_mean = partition_mean + noise
-        
-        summarystat = [np.array([noisy_mean])]
-        return (summarystat, len(partition_df), {})
-        
+        df = load_clientdata(self.client_id)
+        wrong_terms = ground_truth_checker(df)
+
+        # Convert to NumPy array (e.g., byte-encoded string list)
+        encoded_terms = np.array([term.encode('utf-8') for term in wrong_terms], dtype=object)
+
+        return [encoded_terms], len(encoded_terms), {}
+
 # ============================================================================
 # CLIENT APP CONFIGURATION
 # ============================================================================
