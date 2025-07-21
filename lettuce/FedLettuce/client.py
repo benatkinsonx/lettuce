@@ -7,7 +7,7 @@ from datasets import Dataset
 from flwr_datasets.partitioner import IidPartitioner
 import flwr as fl
 from flwr.client import ClientApp, NumPyClient
-from flwr.common import Context
+from flwr.common import Context, ndarrays_to_parameters, parameters_to_ndarrays
 import hashlib
 import os
 
@@ -42,20 +42,27 @@ class FlowerClient(NumPyClient):
         self.client_id = client_id
 
     def fit(self, parameters, config):
-        df = load_clientdata(self.client_id)
-        wrong_terms = ground_truth_checker(df)
+        # Load the partitioned dataset for this client
+        partition_df = load_clientdata(self.client_id)
+        # Example: identify incorrect terms (replace this with your logic)
+        wrong_terms = ground_truth_checker(partition_df)
         print(f"Client {self.client_id} wrong terms: {wrong_terms}")
 
         if len(wrong_terms) == 0:
-            param_array = np.array([], dtype=np.uint8)
+            byte_data = b""  # No terms to send
         else:
             joined_terms = "\n".join(wrong_terms)
-            byte_data = joined_terms.encode('utf-8')
-            param_array = np.frombuffer(byte_data, dtype=np.uint8)
+            byte_data = joined_terms.encode("utf-8")
 
-        print(f"Client {self.client_id} sending parameter array of shape {param_array.shape} and dtype {param_array.dtype}")
+        # Convert bytes to uint8 numpy array
+        param_array = np.frombuffer(byte_data, dtype=np.uint8)
 
-        return [param_array], len(wrong_terms), {}
+        # Wrap the array in a Flower Parameters object
+        parameters = ndarrays_to_parameters([param_array])
+
+        # Return the parameters, the count (as num_examples), and empty metrics
+        return ([param_array], len(wrong_terms), {})
+
 
 
 

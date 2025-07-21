@@ -19,22 +19,22 @@ from config import NUM_CLIENTS, MIN_NUM_CLIENTS, NUM_ROUNDS
 # ============================================================================
 
 def aggregate_failed_terms(results):
-    counts = {}
+    term_counter = {}
 
     for _, fit_res in results:
-        # Get the numpy uint8 array from client parameters
-        param_array = fit_res.parameters[0]
+        # Properly decode parameters
+        arrays = parameters_to_ndarrays(fit_res.parameters)
+        if not arrays:
+            continue
 
-        # Convert back to bytes
-        byte_data = param_array.tobytes()
-
-        # Decode the string and split by newline to get original terms
-        terms = byte_data.decode('utf-8').split('\n')
+        param_array = arrays[0]
+        terms = param_array.tobytes().decode("utf-8").split("\n")
 
         for term in terms:
-            counts[term] = counts.get(term, 0) + 1
+            if term:
+                term_counter[term] = term_counter.get(term, 0) + 1
 
-    return counts
+    return term_counter
 
 
 def convert_scalar_to_FlowerParameters(aggregated_value: float) -> Parameters:
@@ -73,9 +73,19 @@ class FedAnalytics(Strategy):
         failed_terms = aggregate_failed_terms(results)
         print(f"❌ Aggregated failed terms from round {server_round}: {failed_terms}")
 
-        # Convert to Flower Parameters to pass into the next round if needed (even if unused)
-        failed_terms_bytes = [term.encode("utf-8") for term in failed_terms]
-        return ndarrays_to_parameters([np.array(failed_terms_bytes, dtype=object)]), {"num_failed_terms": len(failed_terms)}
+        # Join all failed terms into one string separated by newline
+        failed_terms_str = "\n".join(failed_terms.keys())
+        
+        # Encode the string into bytes
+        failed_terms_bytes = failed_terms_str.encode("utf-8")
+        
+        # Convert bytes to numpy uint8 array (numeric, no objects)
+        failed_terms_np = np.frombuffer(failed_terms_bytes, dtype=np.uint8)
+        
+        # Convert to Flower Parameters
+        parameters = ndarrays_to_parameters([failed_terms_np])
+        
+        return parameters, {"num_failed_terms": len(failed_terms)}
 
 
     def evaluate(self, server_round: int, parameters: Parameters) -> Optional[Tuple[float, Dict[str, Scalar]]]:
