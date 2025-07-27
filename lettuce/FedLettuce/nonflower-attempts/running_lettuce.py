@@ -54,13 +54,13 @@ def main():
     print("Simple LETTUCE CLI Call")
     print("=" * 30)
     
-    # Test with single term (exactly like your terminal command)
-    print("=== Single term test ===")
-    call_lettuce_simple("ibuprofen")
+    # # Test with single term (exactly like your terminal command)
+    # print("=== Single term test ===")
+    # call_lettuce_simple("ibuprofen")
     
     # Testing with multiple terms
-    # print("\n=== Multiple terms test ===")
-    # call_lettuce_simple(["ibuprofen", "tylenol"])
+    print("\n=== Multiple terms test ===")
+    call_lettuce_simple(["ibuprofen", "tylenol"])
 
 if __name__ == "__main__":
     main()
