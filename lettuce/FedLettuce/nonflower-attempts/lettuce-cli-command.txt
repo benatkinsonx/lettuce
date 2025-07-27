@@ -1,1 +1,1 @@
-uv run --env-file .env lettuce-cli --informal_names "ibuprofen"
+uv run --env-file .env lettuce-cli --informal_names "ibuprofen" --no-use_llm

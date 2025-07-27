@@ -71,7 +71,7 @@ class FedAnalytics(Strategy):
 
         # Gather all failed terms
         failed_terms = aggregate_failed_terms(results)
-        print(f"❌ Aggregated failed terms from round {server_round}: {failed_terms}")
+        # print(f"❌ Aggregated failed terms from round {server_round}: {failed_terms}")
 
         # Join all failed terms into one string separated by newline
         failed_terms_str = "\n".join(failed_terms.keys())
@@ -85,7 +85,7 @@ class FedAnalytics(Strategy):
         # Convert to Flower Parameters
         parameters = ndarrays_to_parameters([failed_terms_np])
         
-        return parameters, {"num_failed_terms": len(failed_terms)}
+        return parameters, failed_terms
 
 
     def evaluate(self, server_round: int, parameters: Parameters) -> Optional[Tuple[float, Dict[str, Scalar]]]:

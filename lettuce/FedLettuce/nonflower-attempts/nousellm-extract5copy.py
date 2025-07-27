@@ -74,12 +74,12 @@ def main():
     print("=" * 30)
     
     # # Test with single term (exactly like your terminal command)
-    # print("=== Single term test ===")
-    # call_lettuce_simple("ibuprofen")
+    print("=== Single term test ===")
+    call_lettuce_simple("acetaminophen")
     
     # Testing with multiple terms
-    print("\n=== Multiple terms test ===")
-    call_lettuce_simple(["Memantine HCL", "Ppaliperidone (3-month)"])
+    # print("\n=== Multiple terms test ===")
+    # call_lettuce_simple(["Memantine HCL", "Ppaliperidone (3-month)"])
 
 if __name__ == "__main__":
     main()
