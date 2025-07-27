@@ -2,7 +2,7 @@
 """
 Call LETTUCE CLI from Python and check ground truth
 """
-
+# ALL LETTUCE ONLY CLIENT LOGIC WORKS
 import subprocess
 import os
 import ast
