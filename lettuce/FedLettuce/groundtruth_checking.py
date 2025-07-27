@@ -16,7 +16,7 @@ def call_lettuce_simple(informal_names):
         terms = informal_names
 
     print(informal_names)
-    cmd = ["uv", "run", "--env-file", ".env", "lettuce-cli", "--informal_names"] + terms
+    cmd = ["uv", "run", "--env-file", ".env", "lettuce-cli", "--informal_names"] + terms + ['--no-use_llm']
     print(f"Running: {' '.join(cmd)}")
 
     try:
@@ -24,7 +24,7 @@ def call_lettuce_simple(informal_names):
             cmd,
             capture_output=True,
             text=True,
-            cwd="/home/apyba3/lettuce/lettuce"
+            cwd="/home/benat/lettuce/lettuce"
         )
 
         raw_output = result.stdout
@@ -38,7 +38,11 @@ def call_lettuce_simple(informal_names):
 
         results_dict = {}
         for query_dict in clean_results_dict:
-            topk_results = [d['content'] for d in query_dict['Vector Search Results']]
+            # topk_results = [d['content'] for d in query_dict['Vector Search Results']]
+            topk_results = [
+                d.get('concept') or d.get('content')
+                for d in query_dict['Vector Search Results']
+            ]
             informal_term = query_dict['query']
             results_dict[informal_term] = topk_results
 
