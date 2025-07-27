@@ -20,7 +20,7 @@ def call_lettuce_simple(informal_names):
         terms = informal_names
     
     # command you would run in terminal
-    cmd = ["uv", "run", "--env-file", ".env", "lettuce-cli", "--informal_names"] + terms
+    cmd = ["uv", "run", "--env-file", ".env", "lettuce-cli", "--informal_names"] + terms + ["--no-use_llm"]
     
     print(f"Running: {' '.join(cmd)}")
     
@@ -30,7 +30,7 @@ def call_lettuce_simple(informal_names):
             cmd, # the command to run
             capture_output=True, # result will contain stdout and stderr
             text=True,
-            cwd="/home/apyba3/lettuce/lettuce"
+            cwd="/home/benat/lettuce/lettuce"
         )
         
         # if the cli command was run successfully, print the output
