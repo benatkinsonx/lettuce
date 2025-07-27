@@ -1,5 +1,7 @@
 # simulation.py
 
+# IT WORKS IT WORKS FLOWER WORKS YAYYYY
+
 import flwr as fl
 from flwr.simulation import run_simulation
 
