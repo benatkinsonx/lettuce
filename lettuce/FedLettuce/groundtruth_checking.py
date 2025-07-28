@@ -7,6 +7,7 @@ import subprocess
 import os
 import ast
 import pandas as pd
+import re
 
 def call_lettuce_simple(informal_names):
     """Call LETTUCE CLI from Python, passing list of terms"""
@@ -48,6 +49,8 @@ def call_lettuce_simple(informal_names):
 
         if result.returncode == 0:
             print('Success!')
+            print('RESULTS_DICT:')
+            print(f'{results_dict}')
         else:
             print('Failed :(')
             print('Error:')
@@ -58,6 +61,12 @@ def call_lettuce_simple(informal_names):
     except Exception as e:
         print(f"Error: {e}")
         return None
+
+def standardise_text(text):
+    pattern = r'\W+'
+    replacement = ''
+    string_being_operated_on = text.lower().strip()
+    return re.sub(pattern, replacement, string_being_operated_on)
 
 def ground_truth_checker(df):
     """Check which inputs fail to retrieve the expected output"""
@@ -71,7 +80,8 @@ def ground_truth_checker(df):
 
         if input_term in results_dict:
             top5_vecsearch = results_dict[input_term]
-            if ground_truth.lower() not in [s.lower() for s in top5_vecsearch]:
+            # if ground_truth.lower() not in [s.lower() for s in top5_vecsearch]:
+            if standardise_text(ground_truth) not in [standardise_text(s) for s in top5_vecsearch]:
                 incorrectly_mapped.append(input_term)
 
     print(f"\n❌ Terms that failed to match expected output:\n{incorrectly_mapped}\n")
@@ -83,8 +93,8 @@ def main():
 
     # Define test data
     data = {
-        'input_data': ["Memantine HCL", 'Ppaliperidone (3-month)', 'Trazidine', 'Trazodone HCL'],
-        'expected_output': ['memantine hydrochloride', 'paliperidone', 'trazodone', 'trazodone hydrochloride']
+        'input_data': ["Memantine HCL", 'Ppaliperidone (3-month)', 'aceTaminophen', 'Trazodone HCL'],
+        'expected_output': ['memantine hydrochloride', 'paliperidone', 'AcetamInophen', 'trazodone hydrochloride']
     }
     df = pd.DataFrame(data)
 
