@@ -1,6 +1,7 @@
 # simulation.py
 
 # IT WORKS IT WORKS FLOWER WORKS YAYYYY
+# update: sometimes flower will say out of memory error --> solution: restart laptop
 
 import flwr as fl
 from flwr.simulation import run_simulation
