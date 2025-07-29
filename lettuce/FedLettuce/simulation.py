@@ -9,8 +9,8 @@ from flwr.simulation import run_simulation
 from config import NUM_CLIENTS
 
 # server and client apps
-from server import server
-from client import client
+from server_decrypt import server
+from client_encrypt import client
 
 
 if __name__ == "__main__":

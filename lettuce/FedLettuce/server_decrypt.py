@@ -13,6 +13,9 @@ from flwr.common import (
 )
 
 from config import NUM_CLIENTS, MIN_NUM_CLIENTS, NUM_ROUNDS
+from cipher import SimpleCipher
+
+cipher = SimpleCipher(seed=42)
 
 # ============================================================================
 # AGGREGATION FUNCTIONS
@@ -29,8 +32,13 @@ def aggregate_failed_terms(results):
 
         param_array = arrays[0]
         terms = param_array.tobytes().decode("utf-8").split("\n")
+        print('=================BEFORE DECRYPTION==================')
+        print(terms)
+        print('=================AFTER DECRYPTION==================')
+        decrypted_terms = cipher.decrypt_term_list(terms)
+        print(decrypted_terms)
 
-        for term in terms:
+        for term in decrypted_terms:
             if term:
                 term_counter[term] = term_counter.get(term, 0) + 1
 

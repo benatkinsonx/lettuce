@@ -52,7 +52,7 @@ class FlowerClient(NumPyClient):
         cipher = SimpleCipher(seed=42)
         encrypted_wrongterms = cipher.encrypt_term_list(wrongterms)
 
-        if len(wrong_terms) == 0:
+        if len(encrypted_wrongterms) == 0:
             byte_data = b""  # No terms to send
         else:
             joined_terms = "\n".join(encrypted_wrongterms)
