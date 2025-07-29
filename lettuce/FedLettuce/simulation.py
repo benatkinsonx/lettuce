@@ -28,5 +28,5 @@ if __name__ == "__main__":
         server_app=server,
         client_app=client,
         num_supernodes=NUM_CLIENTS,
-        backend_config=backend_config,
+        backend_config=backend_config
     )
