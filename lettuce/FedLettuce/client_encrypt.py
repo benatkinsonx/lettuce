@@ -13,7 +13,7 @@ import os
 
 from config import NUM_CLIENTS
 from groundtruth_checking import ground_truth_checker
-from cipher import SimpleCipher
+from cipher import SubstitutionCipher
 
 # ============================================================================
 # DATA LOADING & PARTITIONING
@@ -49,7 +49,7 @@ class FlowerClient(NumPyClient):
         wrongterms = ground_truth_checker(partition_df)
         print(f"Client {self.client_id} wrong terms: {wrongterms}")
         
-        cipher = SimpleCipher(seed=42)
+        cipher = SubstitutionCipher(seed=42)
         encrypted_wrongterms = cipher.encrypt_term_list(wrongterms)
 
         if len(encrypted_wrongterms) == 0:

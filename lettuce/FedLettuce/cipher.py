@@ -2,7 +2,7 @@ import random
 import string
 import json
 
-class SimpleCipher:
+class SubstitutionCipher:
     """For encrypting the raw data sent from client to server"""
 
     def __init__(self, seed=42):

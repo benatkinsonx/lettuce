@@ -13,9 +13,9 @@ from flwr.common import (
 )
 
 from config import NUM_CLIENTS, MIN_NUM_CLIENTS, NUM_ROUNDS
-from cipher import SimpleCipher
+from cipher import SubstitutionCipher
 
-cipher = SimpleCipher(seed=42)
+cipher = SubstitutionCipher(seed=42)
 
 # ============================================================================
 # AGGREGATION FUNCTIONS
