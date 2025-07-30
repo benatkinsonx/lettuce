@@ -77,42 +77,10 @@ class FedAnalytics(Strategy):
             print("No results received")
             return None, {}
 
-        # Gather all failed terms
-        failed_terms = aggregate_failed_terms(results)
-        # print(f"❌ Aggregated failed terms from round {server_round}: {failed_terms}")
-
-        # Join all failed terms into one string separated by newline
-        failed_terms_str = "\n".join(failed_terms.keys())
+        parameters = None
+        metrics = aggregate_failed_terms(results)
         
-        # Encode the string into bytes
-        failed_terms_bytes = failed_terms_str.encode("utf-8")
-        
-        # Convert bytes to numpy uint8 array (numeric, no objects)
-        failed_terms_np = np.frombuffer(failed_terms_bytes, dtype=np.uint8)
-        
-        # Convert to Flower Parameters
-        parameters = ndarrays_to_parameters([failed_terms_np])
-        
-        return parameters, failed_terms
-
-
-    def evaluate(self, server_round: int, parameters: Parameters) -> Optional[Tuple[float, Dict[str, Scalar]]]:
-        """Evaluate the aggregated parameters"""
-        return None
-        
-        agg_scalar = [arr.item() for arr in parameters_to_ndarrays(parameters)]
-        return 0, {"Aggregated mean age": agg_scalar}
-
-    def configure_evaluate(self, server_round: int, parameters: Parameters, client_manager: ClientManager
-                           ) -> List[Tuple[ClientProxy, EvaluateIns]]:
-        """Configure clients for evaluation (not used in analytics)"""
-        pass
-
-    def aggregate_evaluate(self, server_round: int, results: List[Tuple[ClientProxy, EvaluateRes]], 
-                           failures: List[Union[Tuple[ClientProxy, EvaluateRes], BaseException]]
-                           ) -> Tuple[Optional[float], Dict[str, Scalar]]:
-        """Aggregate evaluation results (not used in analytics)"""
-        pass
+        return parameters, metrics
 
 # ============================================================================
 # SERVER APP CONFIGURATION
