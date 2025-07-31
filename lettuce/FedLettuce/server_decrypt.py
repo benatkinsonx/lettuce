@@ -83,6 +83,7 @@ class FedAnalytics(Strategy):
         
         return parameters, metrics
 
+    # Strategy parent class methods have @abstract decorators meaning you need all the methods specified in it, in the ones I dont use I just pass them
     def configure_evaluate(self, server_round: int, parameters: Parameters, client_manager: ClientManager
                         ) -> List[Tuple[ClientProxy, EvaluateIns]]:
         """Configure clients for evaluation (not used in FA)"""
