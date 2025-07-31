@@ -10,6 +10,7 @@ from flwr.client import ClientApp, NumPyClient
 from flwr.common import Context, ndarrays_to_parameters, parameters_to_ndarrays
 import hashlib
 import os
+import time
 
 from config import NUM_CLIENTS
 from groundtruth_checking import ground_truth_checker
@@ -43,6 +44,7 @@ class FlowerClient(NumPyClient):
         self.client_id = client_id
 
     def fit(self, parameters, config):
+        client_start = time.time()
         # Load the partitioned dataset for this client
         partition_df = load_clientdata(self.client_id)
         # Example: identify incorrect terms (replace this with your logic)
@@ -60,6 +62,9 @@ class FlowerClient(NumPyClient):
 
         # Convert bytes to uint8 numpy array
         param_array = np.frombuffer(byte_data, dtype=np.uint8)
+
+        client_end = time.time()
+        
 
         return ([param_array], len(encrypted_wrongterms), {})
 
