@@ -64,7 +64,7 @@ class FlowerClient(NumPyClient):
         param_array = np.frombuffer(byte_data, dtype=np.uint8)
 
         client_end = time.time()
-        
+        # test
 
         return ([param_array], len(encrypted_wrongterms), {})
 
