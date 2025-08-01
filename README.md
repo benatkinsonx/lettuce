@@ -27,25 +27,17 @@ now open a new terminal window
 - `code .`
 - `add .env file in lettuce/lettuce/.env`
 
-.env file contents:
-
+```env
 DB_HOST=localhost
-
 DB_USER=postgres
-
 DB_PASSWORD=password
-
 DB_NAME=omop
-
 DB_PORT=5432
-
 DB_SCHEMA=public
-
 DB_VECTABLE="embeddings"
-
 DB_VECSIZE=384
 
-- (cd into lettuce/lettuce) uv add "flwr[simulation]" --> this has already been done and is in the pyproject.toml
+- (cd into lettuce/lettuce) `uv add "flwr[simulation]"` --> this has already been done and is in the pyproject.toml
 
 ## How to run FedLettuce
 
