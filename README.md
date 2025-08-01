@@ -27,8 +27,8 @@ now open a new terminal window
 - `code .`
 - `add .env file in lettuce/lettuce/.env`
 
+`.env` file contents:
 ```
-env
 DB_HOST=localhost
 DB_USER=postgres
 DB_PASSWORD=password
