@@ -51,6 +51,7 @@ DB_VECSIZE=384
 4) (to split the HELIOS test set up) `uv run python FedLettuce/data/data_partitioner.py`
 5) (running the actual FedLettuce implementation) `uv run python FedLettuce/simulation.py`
 
+- if you ever get an 'out of memory' error --> `uv run ray stop --force`
 ---
 
 ---

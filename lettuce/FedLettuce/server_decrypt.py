@@ -95,13 +95,20 @@ class FedAnalytics(Strategy):
 
         print(f"\n📥 Server received results from {len(results)} clients")
         
-        # Get client processing times from metrics
         client_times = []
+        weighted_accuracy_sum = 0.0
+        total_samples = 0
         for _, fit_res in results:
             client_time = fit_res.metrics.get('client_processing_time', 0)
             client_times.append(client_time)
+
+            accuracy = fit_res.metrics.get("accuracy", 0.0)
+            num_samples = fit_res.num_examples
+            weighted_accuracy_sum += accuracy * num_samples
+            total_samples += num_samples
         
         avg_client_time = sum(client_times) / len(client_times) if client_times else 0
+        avg_accuracy = weighted_accuracy_sum / total_samples if total_samples > 0 else None
         
         # Time the server aggregation
         metrics, server_aggregation_time = aggregate_failed_terms(results)
@@ -122,14 +129,20 @@ class FedAnalytics(Strategy):
         print(f"   Communication overhead:  {communication_time:.3f}s")
         print(f"   Communication %:         {(communication_time/total_round_time)*100:.1f}%")
         
+        if avg_accuracy is not None:
+            print(f"weighted accuracy: {avg_accuracy:.4f}")
+
         # Calculate scalability metrics
-        if len(results) > 0:
-            client_throughput = len(results) / server_aggregation_time
-            print(f"   Server throughput:       {client_throughput:.2f} clients/second")
+        # if len(results) > 0:
+        #     client_throughput = len(results) / server_aggregation_time
+        #     print(f"   Server throughput:       {client_throughput:.2f} clients/second")
         
         parameters = None
+        returned_metrics = metrics.copy()  # failed terms count dictionary
+        returned_metrics['weighted_average_accuracy'] = avg_accuracy if avg_accuracy is not None else 999.0
+
         
-        return parameters, metrics
+        return parameters, returned_metrics
 
     # Strategy parent class methods have @abstract decorators meaning you need all the methods specified in it, in the ones I dont use I just pass them
     def configure_evaluate(self, server_round: int, parameters: Parameters, client_manager: ClientManager

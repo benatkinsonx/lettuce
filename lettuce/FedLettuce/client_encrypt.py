@@ -60,13 +60,16 @@ class FlowerClient(NumPyClient):
             joined_terms = "\n".join(encrypted_wrongterms)
             byte_data = joined_terms.encode("utf-8")
 
+        accuracy = (len(partition_df) - len(encrypted_wrongterms)) / len(partition_df)
+
         client_end = time.time()
         client_processing_time = client_end - client_start
 
         parameters = [np.frombuffer(byte_data, dtype=np.uint8)] # Convert bytes to uint8 numpy array
-        metrics = {'client_processing_time': client_processing_time}
+        metrics = {'client_processing_time': client_processing_time,
+                   'accuracy': accuracy}
 
-        return (parameters, len(encrypted_wrongterms), metrics)
+        return (parameters, len(partition_df), metrics)
 
 # ============================================================================
 # CLIENT APP CONFIGURATION
