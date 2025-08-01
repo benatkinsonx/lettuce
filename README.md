@@ -1,3 +1,7 @@
+# BenAtkinson FedLettuce
+
+switch to `BA-timing-fedluttuce` branch
+
 # Lettuce: LLM for Efficient Translation and Transformation into Uniform Clinical Encoding 
 
 **Lettuce** is an application for medical researchers that matches the informal medicine names supplied by the user to concepts in the [Observational Health Data Sciences and Informatics](https://www.ohdsi.org) (OMOP) [standardised vocabularies](https://github.com/OHDSI/Vocabulary-v5.0/wiki)
