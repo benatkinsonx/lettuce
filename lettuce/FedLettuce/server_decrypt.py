@@ -1,4 +1,3 @@
-
 # server.py
 
 from typing import List, Tuple, Optional, Dict, Union, Callable
@@ -12,6 +11,7 @@ from flwr.common import (
     Parameters, FitIns, FitRes, EvaluateIns, EvaluateRes, Scalar,
     parameters_to_ndarrays, ndarrays_to_parameters, Context
 )
+import time
 
 from config import NUM_CLIENTS, MIN_NUM_CLIENTS, NUM_ROUNDS
 from cipher import SubstitutionCipher
@@ -19,10 +19,11 @@ from cipher import SubstitutionCipher
 cipher = SubstitutionCipher(seed=42)
 
 # ============================================================================
-# AGGREGATION FUNCTIONS
+# AGGREGATION FUNCTIONS WITH TIMING
 # ============================================================================
 
 def aggregate_failed_terms(results):
+    aggregation_start = time.time()
     term_counter = {}
 
     for _, fit_res in results:
@@ -43,7 +44,12 @@ def aggregate_failed_terms(results):
             if term:
                 term_counter[term] = term_counter.get(term, 0) + 1
 
-    return term_counter
+    aggregation_end = time.time()
+    aggregation_time = aggregation_end - aggregation_start
+    
+    print(f"🔧 Server aggregation completed in {aggregation_time:.3f}s")
+    
+    return term_counter, aggregation_time
 
 
 def convert_scalar_to_FlowerParameters(aggregated_value: float) -> Parameters:
@@ -52,14 +58,15 @@ def convert_scalar_to_FlowerParameters(aggregated_value: float) -> Parameters:
     return ndarrays_to_parameters([results_array])
 
 # ============================================================================
-# FEDERATED ANALYTICS STRATEGY
+# FEDERATED ANALYTICS STRATEGY WITH TIMING
 # ============================================================================
 
 class FedAnalytics(Strategy):
-    """Custom strategy for federated analytics on NHS dataset"""
+    """Custom strategy for federated analytics with timing"""
     
     def __init__(self):
         super().__init__()
+        self.round_start_times = {}  # Track when each round starts
 
     def initialize_parameters(self, client_manager: Optional[ClientManager] = None) -> Optional[Parameters]:
         """Initialize global parameters (none needed for analytics)"""
@@ -68,9 +75,17 @@ class FedAnalytics(Strategy):
     def configure_fit(self, server_round: int, parameters: Parameters, client_manager: ClientManager
                       ) -> List[Tuple[ClientProxy, FitIns]]:
         """Configure clients for the fit round"""
+        
+        # Start timing this round
+        round_start = time.time()
+        self.round_start_times[server_round] = round_start
+        print(f"\n🚀 Round {server_round} started at {time.strftime('%H:%M:%S')}")
+        
         config = {}
         fit_ins = FitIns(parameters, config)
         clients = client_manager.sample(num_clients=NUM_CLIENTS, min_num_clients=MIN_NUM_CLIENTS)
+        
+        print(f"📡 Configured {len(clients)} clients for round {server_round}")
         return [(client, fit_ins) for client in clients]
 
     def aggregate_fit(self, server_round, results, failures):
@@ -78,8 +93,41 @@ class FedAnalytics(Strategy):
             print("No results received")
             return None, {}
 
+        print(f"\n📥 Server received results from {len(results)} clients")
+        
+        # Get client processing times from metrics
+        client_times = []
+        for _, fit_res in results:
+            client_time = fit_res.metrics.get('client_processing_time', 0)
+            client_times.append(client_time)
+        
+        avg_client_time = sum(client_times) / len(client_times) if client_times else 0
+        
+        # Time the server aggregation
+        metrics, server_aggregation_time = aggregate_failed_terms(results)
+        
+        # Calculate total round time
+        round_start = self.round_start_times.get(server_round, time.time())
+        round_end = time.time()
+        total_round_time = round_end - round_start
+        
+        # Calculate communication time
+        communication_time = total_round_time - avg_client_time - server_aggregation_time
+        
+        # Print timing breakdown
+        print(f"\n⏱️ TIMING BREAKDOWN - Round {server_round}")
+        print(f"   Total round time:        {total_round_time:.3f}s")
+        print(f"   Average client time:     {avg_client_time:.3f}s")
+        print(f"   Server aggregation:      {server_aggregation_time:.3f}s")
+        print(f"   Communication overhead:  {communication_time:.3f}s")
+        print(f"   Communication %:         {(communication_time/total_round_time)*100:.1f}%")
+        
+        # Calculate scalability metrics
+        if len(results) > 0:
+            client_throughput = len(results) / server_aggregation_time
+            print(f"   Server throughput:       {client_throughput:.2f} clients/second")
+        
         parameters = None
-        metrics = aggregate_failed_terms(results)
         
         return parameters, metrics
 

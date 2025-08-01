@@ -60,16 +60,13 @@ class FlowerClient(NumPyClient):
             joined_terms = "\n".join(encrypted_wrongterms)
             byte_data = joined_terms.encode("utf-8")
 
-        # Convert bytes to uint8 numpy array
-        param_array = np.frombuffer(byte_data, dtype=np.uint8)
-
         client_end = time.time()
-        # test
+        client_processing_time = client_end - client_start
 
-        return ([param_array], len(encrypted_wrongterms), {})
+        parameters = [np.frombuffer(byte_data, dtype=np.uint8)] # Convert bytes to uint8 numpy array
+        metrics = {'client_processing_time': client_processing_time}
 
-
-
+        return (parameters, len(encrypted_wrongterms), metrics)
 
 # ============================================================================
 # CLIENT APP CONFIGURATION
