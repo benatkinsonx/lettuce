@@ -1,5 +1,5 @@
 # config.py
 
-NUM_CLIENTS = 1
+NUM_CLIENTS = 2
 MIN_NUM_CLIENTS = 1
 NUM_ROUNDS = 1

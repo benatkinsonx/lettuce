@@ -30,7 +30,7 @@ def call_lettuce_simple(informal_names):
             cmd, # the command to run
             capture_output=True, # result will contain stdout and stderr
             text=True,
-            cwd="/home/benat/lettuce/lettuce"
+            cwd="/home/apyba3/lettuce/lettuce"
         )
         
         # if the cli command was run successfully, print the output

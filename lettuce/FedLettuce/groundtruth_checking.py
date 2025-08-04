@@ -25,7 +25,7 @@ def call_lettuce_simple(informal_names):
             cmd,
             capture_output=True,
             text=True,
-            cwd="/home/benat/lettuce/lettuce"
+            cwd="/home/apyba3/lettuce/lettuce"
         )
 
         raw_output = result.stdout
