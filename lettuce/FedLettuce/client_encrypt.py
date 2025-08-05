@@ -14,6 +14,7 @@ import time
 
 from config import NUM_CLIENTS
 from groundtruth_checking import ground_truth_checker
+from llm_groundtruth_checking import llm_ground_truth_checker
 from cipher import SubstitutionCipher
 
 # ============================================================================
@@ -44,11 +45,12 @@ class FlowerClient(NumPyClient):
         self.client_id = client_id
 
     def fit(self, parameters, config):
+        print("================== CLIENT FIT STARTED =================")
         client_start = time.time()
         # Load the partitioned dataset for this client
         partition_df = load_clientdata(self.client_id)
         # Example: identify incorrect terms (replace this with your logic)
-        wrongterms = ground_truth_checker(partition_df)
+        wrongterms = llm_ground_truth_checker(partition_df)
         print(f"Client {self.client_id} wrong terms: {wrongterms}")
         
         cipher = SubstitutionCipher(seed=42)

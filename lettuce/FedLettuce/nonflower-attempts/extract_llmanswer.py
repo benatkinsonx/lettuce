@@ -5,6 +5,7 @@ Simple way to call LETTUCE CLI from Python - just like you would in terminal
 
 import subprocess
 import os
+import ast
 
 def call_lettuce_simple(informal_names):
     """
@@ -33,17 +34,31 @@ def call_lettuce_simple(informal_names):
             cwd="/home/apyba3/lettuce/lettuce"
         )
         
-        # if the cli command was run successfully, print the output
-        if result.returncode == 0: # 0 = success, 1 = not success
-            print("✓ Success!")
-            print(f"Output type = {type(result.stdout)}")
-            print(result.stdout)
-        else: # if the cli command failed, print the error messages
-            print("✗ Failed!")
-            print("Error:")
+        raw_output = result.stdout
+        clean_raw_output = raw_output.replace('\n', '')
+
+        endmarker = '-------------- End ---------------'
+        endmarker_pos = clean_raw_output.find(endmarker)
+
+        clean_results_str = clean_raw_output[endmarker_pos + len(endmarker):]
+        clean_results_dict = ast.literal_eval(clean_results_str)
+
+        results_dict = {}
+        for query_dict in clean_results_dict:
+            llm_answer = query_dict['llm_answer']
+            informal_term = query_dict['query']
+            results_dict[informal_term] = llm_answer
+
+        if result.returncode == 0:
+            print('Success!')
+            print('Output:')
+            print(results_dict)
+        else:
+            print('Failed :(')
+            print('Error:')
             print(result.stderr)
             
-        return result.stdout # and in both of those above cases, always return the cli command output
+        return llm_answer # and in both of those above cases, always return the results
         
     except Exception as e: # for an unexpected error, print the error and return None
         print(f"Error: {e}")
@@ -60,7 +75,7 @@ def main():
     
     # Testing with multiple terms
     print("\n=== Multiple terms test ===")
-    call_lettuce_simple(["ibuprofen", "tylenol"])
+    call_lettuce_simple(["Memantine HCL", "Ppaliperidone (3-month)"])
 
 if __name__ == "__main__":
     main()
