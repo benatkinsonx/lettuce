@@ -95,7 +95,7 @@ def main():
     }
     df = pd.DataFrame(data)
 
-    ground_truth_checker(df)
+    llm_ground_truth_checker(df)
 
 if __name__ == "__main__":
     main()
