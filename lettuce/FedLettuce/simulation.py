@@ -14,9 +14,9 @@ from client_encrypt import client
 
 
 if __name__ == "__main__":
-    print('BA-TIMING-BRANCH')
+    # print('BA-TIMING-BRANCH')
     # Backend configuration
-    backend_config = {"client_resources": {"num_cpus": 1, "num_gpus": 0.0}}
+    backend_config = {"client_resources": {"num_cpus": 1.0, "num_gpus": 1.0}}
     
     # Create client configurations to ensure proper partition assignment
     client_configs = []

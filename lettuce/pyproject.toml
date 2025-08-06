@@ -4,11 +4,11 @@ version = "0.1.0"
 description = "An LLM assistant for mapping OMOP concepts"
 authors = [{name = "James Mitchell White", email = "mbzjim@exmail.notingham.ac.uk"}]
 license = "MIT"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "haystack-ai>=2.7.0",
     "huggingface-hub>=0.24.6",
-    "numpy==1.26.4",
+    "numpy>=1.26,<2.0",
     "pandas>=2.1.0",
     "python-dotenv>=1.0.1",
     "llama-cpp-haystack>=0.4.1,<=0.4.4",
@@ -26,6 +26,8 @@ dependencies = [
     "pgvector==0.3.6",
     "flwr[simulation]>=1.0.0",
     "flwr-datasets>=0.0.2",
+    "torchvision>=0.17.0",
+    "torchaudio>=2.2.0",
 ]
 
 [project.optional-dependencies]

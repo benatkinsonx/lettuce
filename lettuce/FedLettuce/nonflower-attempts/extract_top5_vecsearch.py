@@ -45,7 +45,10 @@ def call_lettuce_simple(informal_names):
 
         results_dict = {}
         for query_dict in clean_results_dict:
-            topk_results = [d['content'] for d in query_dict['Vector Search Results']]
+            topk_results = [
+                d.get('concept') or d.get('content')
+                for d in query_dict['Vector Search Results']
+            ]
             informal_term = query_dict['query']
             results_dict[informal_term] = topk_results
 
