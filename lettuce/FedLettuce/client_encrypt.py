@@ -50,7 +50,7 @@ class FlowerClient(NumPyClient):
         # Load the partitioned dataset for this client
         partition_df = load_clientdata(self.client_id)
         # Example: identify incorrect terms (replace this with your logic)
-        wrongterms = llm_ground_truth_checker(partition_df)
+        wrongterms = ground_truth_checker(partition_df)
         print(f"Client {self.client_id} wrong terms: {wrongterms}")
         
         cipher = SubstitutionCipher(seed=42)

@@ -35,7 +35,16 @@ def call_lettuce_simple(informal_names):
         endmarker_pos = clean_raw_output.find(endmarker)
 
         clean_results_str = clean_raw_output[endmarker_pos + len(endmarker):]
-        clean_results_dict = ast.literal_eval(clean_results_str)
+        # clean_results_dict = ast.literal_eval(clean_results_str)
+        try:
+            clean_results_dict = ast.literal_eval(clean_results_str)
+        except Exception as parse_err:
+            print("Failed to parse LETTUCE CLI output:")
+            print("Raw output:", raw_output)
+            print("Cleaned output string:", clean_results_str)
+            print("Error:", parse_err)
+            return None
+
 
         results_dict = {}
         for query_dict in clean_results_dict:
@@ -69,10 +78,6 @@ def llm_ground_truth_checker(df):
     """Check which inputs fail to retrieve the expected output"""
     informal_names = df['input_data'].tolist()
     results_dict = call_lettuce_simple(informal_names)
-
-    if results_dict is None:
-        print("⚠️ LETTUCE CLI call failed, skipping check")
-        return df['input_data'].tolist()  # treat all as incorrect, or []
 
     incorrectly_mapped = []
     for _, row in df.iterrows():
