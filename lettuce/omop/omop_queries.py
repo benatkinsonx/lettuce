@@ -369,40 +369,40 @@ def query_vector(
         n: int = 5,
         describe_concept:bool = False,
         ) -> Select:
-        filtered_concepts = select(Concept.concept_id)
-        if embed_vocab is not None:
-            filtered_concepts = filtered_concepts.where(Concept.vocabulary_id.in_(embed_vocab))
-        if domain_id is not None:
-            filtered_concepts = filtered_concepts.where(Concept.domain_id.in_(domain_id))
-        if standard_concept:
-            filtered_concepts = filtered_concepts.where(Concept.standard_concept == "S")
-        if valid_concept:
-            filtered_concepts = filtered_concepts.where(Concept.invalid_reason == None)
+    filtered_concepts = select(Concept.concept_id)
+    if embed_vocab is not None:
+        filtered_concepts = filtered_concepts.where(Concept.vocabulary_id.in_(embed_vocab))
+    if domain_id is not None:
+        filtered_concepts = filtered_concepts.where(Concept.domain_id.in_(domain_id))
+    if standard_concept:
+        filtered_concepts = filtered_concepts.where(Concept.standard_concept == "S")
+    if valid_concept:
+        filtered_concepts = filtered_concepts.where(Concept.invalid_reason == None)
 
-        score_expr = Embedding.score(query_embedding).label("score")
+    score_expr = Embedding.score(query_embedding).label("score")
+    
+    embedding_scores = (
+            select(Embedding.concept_id, score_expr)
+            .where(Embedding.concept_id.in_(filtered_concepts))
+            .order_by(score_expr)
+            .limit(n)
+            .cte("embedding_result")
+        )
 
-        embedding_scores = (
-                select(Embedding.concept_id, score_expr)
-                .where(Embedding.concept_id.in_(filtered_concepts))
-                .order_by(score_expr)
-                .limit(n)
-                .cte("embedding_result")
+
+    if describe_concept:
+        query = (
+            select(Concept, embedding_scores.c.score)
+            .join(Concept, Concept.concept_id == embedding_scores.c.concept_id)
+        )
+    else:
+        query = (
+            select(
+                Concept.concept_id.label("id"),
+                Concept.concept_name.label("content"),
+                embedding_scores.c.score,
             )
-
-
-        if describe_concept:
-            query = (
-                select(Concept, embedding_scores.c.score)
-                .join(Concept, Concept.concept_id == embedding_scores.c.concept_id)
-            )
-        else:
-            query = (
-                select(
-                    Concept.concept_id.label("id"),
-                    Concept.concept_name.label("content"),
-                    embedding_scores.c.score,
-                )
-                .join(Concept, Concept.concept_id == embedding_scores.c.concept_id)
-            )
-
-        return query
+            .join(Concept, Concept.concept_id == embedding_scores.c.concept_id)
+        )
+    
+    return query
