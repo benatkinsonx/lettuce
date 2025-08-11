@@ -22,7 +22,7 @@ if __name__ == "__main__":
     print(f"Using device: {DEVICE}")
 
     # Backend config with GPU detection (from Flower tutorial)
-    backend_config = {"client_resources": {"num_cpus": 1, "num_gpus": 0.0}}
+    backend_config = {"client_resources": {"num_cpus": 16, "num_gpus": 0.0}}
 
     # if DEVICE == "cuda":
     #     print('DEVICE = CUDA')
