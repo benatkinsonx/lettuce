@@ -70,6 +70,10 @@ def llm_ground_truth_checker(df):
     informal_names = df['input_data'].tolist()
     results_dict = call_lettuce_simple(informal_names)
 
+    if results_dict is None:
+        print("⚠️ LETTUCE CLI call failed, skipping check")
+        return df['input_data'].tolist()  # treat all as incorrect, or []
+
     incorrectly_mapped = []
     for _, row in df.iterrows():
         input_term = row['input_data']
