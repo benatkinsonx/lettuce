@@ -8,11 +8,8 @@ ENV UV_CACHE_DIR=/tmp/uv_cache \
     PATH="/root/.local/bin:${PATH}"
 
 WORKDIR /src
-COPY pyproject.toml .
-COPY . .
-RUN uv sync
-RUN pip install .
- 
+COPY pyproject.toml ./
+RUN uv sync --extra llama-cpp
 
 # Runtime stage 
 FROM python:3.12-slim-bookworm
@@ -20,14 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \ 
     && rm -rf /var/lib/apt/lists/*
 ENV PATH="/src/.venv/bin:$PATH"
-ENV DB_HOST="localhost"
-ENV DB_USER="postgres"
-ENV DB_PASSWORD="password"
-ENV DB_NAME="omop"
-ENV DB_PORT=5432
-ENV DB_SCHEMA="public"
-ENV DB_VECTABLE="embeddings"
-ENV DB_VECSIZE=384
+ENV INFERENCE_TYPE="llama-cpp-python"
 WORKDIR /src
 COPY --from=builder /src/.venv /src/.venv
 
