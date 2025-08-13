@@ -27,8 +27,8 @@ dependencies = [
     "pydantic-settings>=2.10.1",
     "typer>=0.16.0",
     "ollama-haystack>=4.1.0",
-    "flwr[simulation]>=1.0.0",
-    "flwr-datasets>=0.0.2",
+    "flwr[simulation]==1.4.0",
+    "flwr-datasets==0.5.0",
 ]
 
 [project.optional-dependencies]
