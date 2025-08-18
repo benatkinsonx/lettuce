@@ -1,6 +1,6 @@
 # BenAtkinson FedLettuce
 
-### switch to `BA-timing-fedlettuce` branch
+### switch to `BA-useLLM` branch
 
 ---
 
